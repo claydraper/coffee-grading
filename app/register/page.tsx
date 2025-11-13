@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { signIn } from 'next-auth/react';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -14,6 +15,8 @@ export default function Register() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -26,13 +29,12 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
-    // Basic validation
+
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return;
     }
-    
+
     if (formData.password.length < 8) {
       setError('Password must be at least 8 characters long');
       return;
@@ -41,7 +43,8 @@ export default function Register() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/auth/register', {
+      // Register the user
+      const registerResponse = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,16 +56,29 @@ export default function Register() {
         }),
       });
 
-      const data = await response.json();
+      const data = await registerResponse.json();
 
-      if (!response.ok) {
+      if (!registerResponse.ok) {
         throw new Error(data.message || 'Registration failed');
       }
 
-      // Redirect to dashboard after successful registration
-      router.push('/dashboard');
+      // Sign in the user after successful registration
+      const result = await signIn('credentials', {
+        redirect: false,
+        email: formData.email,
+        password: formData.password,
+        callbackUrl: callbackUrl,
+      });
+
+      if (result?.error) {
+        // If there's an error during sign in, redirect to login page
+        router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
+      } else {
+        // If sign in is successful, redirect to the callback URL or dashboard
+        router.push(callbackUrl);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
+      setError(err instanceof Error ? err.message : 'An error occurred during registration');
       setIsLoading(false);
     }
   };
@@ -81,7 +97,7 @@ export default function Register() {
             </Link>
           </p>
         </div>
-        
+
         {error && (
           <div className="bg-red-50 border-l-4 border-red-400 p-4">
             <div className="flex">
@@ -168,9 +184,8 @@ export default function Register() {
             <button
               type="submit"
               disabled={isLoading}
-              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
-                isLoading ? 'opacity-75 cursor-not-allowed' : ''
-              }`}
+              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${isLoading ? 'opacity-75 cursor-not-allowed' : ''
+                }`}
             >
               {isLoading ? 'Creating account...' : 'Create Account'}
             </button>

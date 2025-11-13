@@ -1,7 +1,7 @@
+// app/api/auth/register/route.ts
 import { NextResponse } from 'next/server';
-import prisma from '@/app/lib/prisma';
-import { hashPassword } from '@/app/lib/auth/password';
-import { createSession } from '@/app/lib/actions/session';
+import { prisma } from '@/auth';
+import { hash } from 'bcryptjs';
 
 export async function POST(request: Request) {
   try {
@@ -10,69 +10,71 @@ export async function POST(request: Request) {
     // Validate input
     if (!name || !email || !password) {
       return NextResponse.json(
-        { message: 'Name, email, and password are required' },
+        { error: 'Name, email, and password are required' },
         { status: 400 }
       );
     }
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email },
+      where: { email: email.toLowerCase() },
     });
 
     if (existingUser) {
       return NextResponse.json(
-        { message: 'User with this email already exists' },
+        { error: 'User with this email already exists' },
         { status: 400 }
       );
     }
 
-    // Hash password
-    const { hash, salt } = await hashPassword(password);
+    // Hash password with bcrypt
+    const hashedPassword = await hash(password, 12);
 
     // Create user
     const user = await prisma.user.create({
       data: {
         name,
-        email,
-        hashedPassword: hash,
-        salt,
+        email: email.toLowerCase(),
+        hashedPassword,
       },
       select: {
         id: true,
         name: true,
         email: true,
-        createdAt: true,
       },
     });
 
-    // Create a session for the new user
-    const sessionToken = await createSession({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-    });
-
-    const response = NextResponse.json(
-      { message: 'Registration successful', user },
+    return NextResponse.json(
+      {
+        user,
+        message: 'Registration successful'
+      },
       { status: 201 }
     );
-
-    // Set the session cookie with the resolved session token
-    response.cookies.set({
-      name: 'session_token',
-      value: sessionToken,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-    });
-
-    return response;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Registration error:', error);
+
+    let errorMessage = 'An error occurred during registration';
+    let errorDetails: unknown = undefined;
+
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      if (process.env.NODE_ENV === 'development') {
+        errorDetails = {
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        };
+      }
+    } else if (typeof error === 'string') {
+      errorMessage = error;
+    }
+
     return NextResponse.json(
-      { message: 'Internal server error' },
+      {
+        error: errorMessage,
+        ...(process.env.NODE_ENV === 'development' && { details: errorDetails })
+      },
       { status: 500 }
     );
   }

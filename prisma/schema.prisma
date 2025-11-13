@@ -13,15 +13,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model User {
   id             String    @id @default(uuid())
   email          String    @unique
   name           String
   hashedPassword String
-  salt           String
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   sessions       Session[]
+  cuppings       Cupping[]
+  samples        Sample[]
 
   @@map("users")
 }
@@ -36,4 +38,78 @@ model Session {
   updatedAt    DateTime @updatedAt
 
   @@map("sessions")
+}
+
+model Cupping {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  date        DateTime  @default(now())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  samples     Sample[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("cuppings")
+}
+
+model Sample {
+  id                String    @id @default(uuid())
+  cuppingId         String
+  cupping           Cupping   @relation(fields: [cuppingId], references: [id], onDelete: Cascade)
+  sampleId          String
+  origin            String
+  process           String
+  variety           String?
+  elevation         Int?      @default(0) @db.SmallInt
+  roaster           String?
+  roastDate         DateTime?
+  roastLevel        RoastLevel?
+  roasterNotes      String?
+  
+  // Physical Analysis
+  primaryDefects    Int?       @default(0) @db.SmallInt
+  secondaryDefects  Int?       @default(0) @db.SmallInt
+  moisture          Float?
+  density           String?
+  screenSize        String?
+  
+  // Cupping Evaluation
+  fragranceAroma    Decimal   @default(6.00) @db.Decimal(4,2)
+  dry               Decimal   @default(6.00) @db.Decimal(4,2)
+  break             Decimal   @default(6.00) @db.Decimal(4,2)
+  flavor            Decimal   @default(6.00) @db.Decimal(4,2)
+  aftertaste        Decimal   @default(6.00) @db.Decimal(4,2)
+  acidity           Decimal   @default(6.00) @db.Decimal(4,2)
+  body              Decimal   @default(6.00) @db.Decimal(4,2)
+  uniformity        Int?      @db.SmallInt
+  balance           Decimal   @default(6.00) @db.Decimal(4,2)
+  cleanCup          Int?      @db.SmallInt
+  sweetness         Int?      @db.SmallInt
+  overall           Decimal   @default(6.00) @db.Decimal(4,2)
+  
+  // Defects
+  taint             Int       @default(0) @db.SmallInt
+  fault             Int       @default(0) @db.SmallInt
+  roastDefects      String?
+  
+  // Calculated
+  finalScore        Decimal   @default(0.00) @db.Decimal(4,2)
+  
+  // Metadata
+  notes             String?
+  userId            String
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@map("samples")
+}
+
+enum RoastLevel {
+  LIGHT
+  MEDIUM
+  MEDIUM_DARK
+  DARK
 }

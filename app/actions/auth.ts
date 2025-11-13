@@ -1,7 +1,8 @@
 'server';
 
-import { getCurrentUser as getCurrentUserFromSession } from '@/app/lib/auth/session';
+import { auth } from '@/auth';
 
 export async function getCurrentUser() {
-  return await getCurrentUserFromSession();
+  const session = await auth();
+  return session?.user || null;
 }
