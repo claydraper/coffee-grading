@@ -99,7 +99,7 @@ export default function SampleForm({ sample, onUpdate }: SampleFormProps) {
           step={step}
           value={displayValue}
           onChange={handleChange}
-          className="w-full p-2 border rounded-md"
+          className="w-full p-2 border rounded-md text-gray-900"
         />
       </div>
     );
@@ -118,7 +118,7 @@ export default function SampleForm({ sample, onUpdate }: SampleFormProps) {
               name="sampleId"
               value={formData.sampleId || ''}
               onChange={handleChange}
-              className="w-full p-2 border rounded-md"
+              className="w-full p-2 border rounded-md text-gray-900"
               required
             />
           </div>
@@ -129,7 +129,7 @@ export default function SampleForm({ sample, onUpdate }: SampleFormProps) {
               name="origin"
               value={formData.origin || ''}
               onChange={handleChange}
-              className="w-full p-2 border rounded-md"
+              className="w-full p-2 border rounded-md text-gray-900"
               required
             />
           </div>
@@ -168,7 +168,7 @@ export default function SampleForm({ sample, onUpdate }: SampleFormProps) {
               name="roastDefects"
               value={formData.roastDefects || ''}
               onChange={handleChange}
-              className="w-full p-2 border rounded-md"
+              className="w-full p-2 border rounded-md text-gray-900"
               rows={3}
             />
           </div>
@@ -182,7 +182,7 @@ export default function SampleForm({ sample, onUpdate }: SampleFormProps) {
           name="notes"
           value={formData.notes || ''}
           onChange={handleChange}
-          className="w-full p-2 border rounded-md"
+          className="w-full p-2 border rounded-md text-gray-900"
           rows={3}
         />
       </div>

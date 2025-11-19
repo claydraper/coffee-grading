@@ -18,7 +18,7 @@ export async function PUT(
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const data = await request.json();
 
     // Ensure the sample belongs to the current user

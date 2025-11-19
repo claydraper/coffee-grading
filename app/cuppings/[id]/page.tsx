@@ -19,18 +19,18 @@ export default function CuppingPage() {
       setLoading(false);
       return;
     }
-    
+
     const fetchCupping = async () => {
       try {
         const response = await fetch(`/api/cuppings/${id}?includeSamples=true`, {
           credentials: 'include', // Ensure cookies are sent with the request
         });
-        
+
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
           throw new Error(errorData.error || 'Failed to fetch cupping');
         }
-        
+
         const data = await response.json();
         setCupping(data);
       } catch (err) {
@@ -48,10 +48,10 @@ export default function CuppingPage() {
 
   const handleSampleUpdate = (updatedSample: any) => {
     if (!cupping) return;
-    
+
     setCupping({
       ...cupping,
-      samples: cupping.samples.map(sample => 
+      samples: cupping.samples.map(sample =>
         sample.id === updatedSample.id ? updatedSample : sample
       )
     });
@@ -71,14 +71,14 @@ export default function CuppingPage() {
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Cupping: {cupping.name}</h1>
       {cupping.description && <p className="mb-6">{cupping.description}</p>}
-      
+
       <div className="space-y-8">
         {cupping.samples.map((sample, index) => (
           <div key={sample.id} className="border rounded-lg p-6 bg-white shadow-sm">
-            <h2 className="text-xl font-semibold mb-4">Sample {index + 1}</h2>
-            <SampleForm 
-              sample={sample} 
-              onUpdate={handleSampleUpdate} 
+            <h2 className="text-xl text-gray-900 font-semibold mb-4">Sample {index + 1}</h2>
+            <SampleForm
+              sample={sample}
+              onUpdate={handleSampleUpdate}
             />
           </div>
         ))}
