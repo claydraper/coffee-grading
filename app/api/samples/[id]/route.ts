@@ -3,9 +3,8 @@ import { auth } from '@/auth';
 import { PrismaClient } from '@prisma/client';
 import { prisma } from '@/app/lib/prisma';
 
-// Type assertion to fix the Prisma client type
 const prismaClient = prisma as unknown as PrismaClient & {
-  sample: any; // Use 'any' as a last resort
+  sample: any;
 };
 
 export async function PUT(
@@ -21,7 +20,6 @@ export async function PUT(
     const { id } = await params;
     const data = await request.json();
 
-    // Ensure the sample belongs to the current user
     const sample = await prismaClient.sample.findUnique({
       where: { id },
       include: { cupping: true }
@@ -31,14 +29,10 @@ export async function PUT(
       return new NextResponse('Not found', { status: 404 });
     }
 
-    // Update the sample
     const updatedSample = await prismaClient.sample.update({
       where: { id },
       data: {
         ...data,
-        // Ensure numeric fields are properly typed
-        elevation: data.elevation ? parseInt(data.elevation) : null,
-        roastDate: data.roastDate ? new Date(data.roastDate) : null,
       },
     });
 

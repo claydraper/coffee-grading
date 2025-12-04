@@ -7,7 +7,7 @@ export default function NewCuppingPage() {
   const router = useRouter();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [numberOfSamples, setNumberOfSamples] = useState(3);
+  const [numberOfSamples, setNumberOfSamples] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -41,9 +41,7 @@ export default function NewCuppingPage() {
         throw new Error('Failed to get cupping ID from response');
       }
 
-      // Redirect to the cupping's sample entry page
       router.push(`/cuppings/${id}`);
-      // Force a full page reload to ensure all data is loaded
       router.refresh();
     } catch (err) {
       console.error('Error creating cupping:', err);
@@ -57,9 +55,6 @@ export default function NewCuppingPage() {
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Create New Cupping Session</h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Start by providing some basic information about your cupping session.
-          </p>
         </div>
 
         <div className="bg-white py-8 px-6 shadow rounded-lg sm:px-10">
@@ -101,12 +96,26 @@ export default function NewCuppingPage() {
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
-                  placeholder="E.g., November 2023 Cupping"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none  sm:text-sm"
                 />
               </div>
             </div>
-
+            <div>
+              <label htmlFor="numberOfSamples" className="block text-sm font-medium text-gray-700">
+                Number of Samples *
+              </label>
+              <div className="mt-1">
+                <input
+                  type="number"
+                  id="numberOfSamples"
+                  name="numberOfSamples"
+                  min="1"
+                  value={numberOfSamples}
+                  onChange={(e) => setNumberOfSamples(Number(e.target.value))}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none  sm:text-sm"
+                />
+              </div>
+            </div>
             <div>
               <label htmlFor="description" className="block text-sm font-medium text-gray-700">
                 Description
@@ -118,36 +127,10 @@ export default function NewCuppingPage() {
                   rows={3}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
-                  placeholder="Add any notes about this cupping session..."
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-gray-900 focus:outline-none  sm:text-sm"
                 />
               </div>
             </div>
-
-            <div>
-              <label htmlFor="numberOfSamples" className="block text-sm font-medium text-gray-700">
-                Number of Samples
-              </label>
-              <div className="mt-1">
-                <select
-                  id="numberOfSamples"
-                  name="numberOfSamples"
-                  value={numberOfSamples}
-                  onChange={(e) => setNumberOfSamples(Number(e.target.value))}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-900 focus:outline-none focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
-                >
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                    <option key={num} value={num}>
-                      {num} {num === 1 ? 'sample' : 'samples'}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <p className="mt-2 text-sm text-gray-500">
-                You can add more details for each sample in the next step.
-              </p>
-            </div>
-
             <div className="flex justify-end space-x-3 pt-4">
               <button
                 type="button"

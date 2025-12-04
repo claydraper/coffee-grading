@@ -38,9 +38,6 @@ export default function Dashboard() {
         <div className="px-4 py-6 sm:px-0">
           <div className="border-4 border-dashed border-gray-200 rounded-lg p-6">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Dashboard</h2>
-            <p className="text-gray-600">
-              Welcome to your dashboard, {session?.user?.name || 'User'}! You are now logged in.
-            </p>
           </div>
         </div>
       </main>

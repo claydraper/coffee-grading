@@ -7,10 +7,8 @@ export async function GET(
   request: Request,
   context: { params: { id: string } }
 ) {
-  // Await the params to ensure it's resolved
   const params = await Promise.resolve(context.params);
   try {
-    // Get the current session
     const session = await auth();
     if (!session?.user) {
       return NextResponse.json(
@@ -29,11 +27,10 @@ export async function GET(
       );
     }
 
-    // Find the cupping by ID and include samples if requested
     const cupping = await prisma.cupping.findFirst({
       where: {
         id: params.id,
-        userId: session.user.id, // Ensure the cupping belongs to the current user
+        userId: session.user.id,
       },
       include: {
         samples: includeSamples,

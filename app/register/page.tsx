@@ -71,10 +71,8 @@ export default function Register() {
       });
 
       if (result?.error) {
-        // If there's an error during sign in, redirect to login page
         router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
       } else {
-        // If sign in is successful, redirect to the callback URL or dashboard
         router.push(callbackUrl);
       }
     } catch (err) {
@@ -117,7 +115,7 @@ export default function Register() {
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="name" className="sr-only">
-                Full Name
+                Name
               </label>
               <input
                 id="name"
@@ -127,12 +125,12 @@ export default function Register() {
                 value={formData.name}
                 onChange={handleChange}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Full Name"
+                placeholder="Name"
               />
             </div>
             <div>
               <label htmlFor="email-address" className="sr-only">
-                Email address
+                Email
               </label>
               <input
                 id="email"
@@ -143,7 +141,7 @@ export default function Register() {
                 value={formData.email}
                 onChange={handleChange}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
+                placeholder="Email"
               />
             </div>
             <div>
@@ -159,7 +157,7 @@ export default function Register() {
                 value={formData.password}
                 onChange={handleChange}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password (min 8 characters)"
+                placeholder="Password"
               />
             </div>
             <div>

@@ -12,7 +12,6 @@ export default function Header() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -36,7 +35,6 @@ export default function Header() {
     }
   };
 
-  // Don't show header on login/register pages
   if (pathname === '/login' || pathname === '/register') {
     return null;
   }

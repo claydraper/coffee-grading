@@ -4,8 +4,8 @@ import { NextResponse } from 'next/server';
 export default auth((req) => {
   const isLoggedIn = !!req.auth?.user;
   const isApiAuthRoute = req.nextUrl.pathname.startsWith('/api/auth');
-  const isAuthPage = req.nextUrl.pathname.startsWith('/login') || 
-                    req.nextUrl.pathname.startsWith('/register');
+  const isAuthPage = req.nextUrl.pathname.startsWith('/login') ||
+    req.nextUrl.pathname.startsWith('/register');
   const isPublicRoute = ['/'].includes(req.nextUrl.pathname);
   const isApiRoute = req.nextUrl.pathname.startsWith('/api');
   const isProtectedRoute = req.nextUrl.pathname.startsWith('/cuppings');
@@ -48,11 +48,6 @@ export default auth((req) => {
 
 export const config = {
   matcher: [
-    // Match all request paths except for the ones starting with:
-    // - _next/static (static files)
-    // - _next/image (image optimization files)
-    // - favicon.ico (favicon file)
-    // - public folder
     '/((?!_next/static|_next/image|favicon.ico|images/).*)',
   ],
 };

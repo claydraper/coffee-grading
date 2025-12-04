@@ -19,7 +19,6 @@ export default function SampleForm({ sample, onUpdate }: SampleFormProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
 
-    // Convert numeric inputs to numbers
     const numericValue = ['fragranceAroma', 'dry', 'breakScore', 'flavor', 'aftertaste',
       'acidity', 'body', 'uniformity', 'balance', 'cleanCup', 'sweetness', 'overall',
       'primaryDefects', 'secondaryDefects', 'moisture', 'taint', 'fault'].includes(name)
@@ -28,8 +27,13 @@ export default function SampleForm({ sample, onUpdate }: SampleFormProps) {
 
     const updatedData = { ...formData, [name]: numericValue };
 
-    // Calculate final score if needed
-    if (name === 'overall') {
+    const scoreFields = [
+      'fragranceAroma', 'flavor', 'aftertaste', 'acidity', 'body',
+      'uniformity', 'balance', 'cleanCup', 'sweetness', 'overall',
+      'taint', 'fault'
+    ];
+
+    if (scoreFields.includes(name)) {
       updatedData.finalScore = calculateFinalScore(updatedData);
     }
 
@@ -38,19 +42,26 @@ export default function SampleForm({ sample, onUpdate }: SampleFormProps) {
   };
 
   const calculateFinalScore = (data: Partial<Sample>) => {
-    // Implement your scoring logic here
-    // This is a simplified example - adjust based on your requirements
-    const {
-      fragranceAroma = 0,
-      flavor = 0,
-      aftertaste = 0,
-      acidity = 0,
-      body = 0,
-      balance = 0,
-      overall = 0
-    } = data;
+    const qualitySum = (
+      (data.fragranceAroma ?? 0) +
+      (data.flavor ?? 0) +
+      (data.aftertaste ?? 0) +
+      (data.acidity ?? 0) +
+      (data.body ?? 0) +
+      (data.uniformity ?? 0) +
+      (data.balance ?? 0) +
+      (data.cleanCup ?? 0) +
+      (data.sweetness ?? 0) +
+      (data.overall ?? 0)
+    );
 
-    return (fragranceAroma + flavor + aftertaste + acidity + body + balance + overall) / 7;
+    const taintPenalty = (data.taint ?? 0) * 2;
+    const faultPenalty = (data.fault ?? 0) * 4;
+    const totalPenalty = taintPenalty + faultPenalty;
+
+    const finalScore = qualitySum - totalPenalty;
+
+    return finalScore;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -108,7 +119,6 @@ export default function SampleForm({ sample, onUpdate }: SampleFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Sample Info */}
         <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
           <h3 className="font-medium">Sample Information</h3>
           <div>
@@ -135,7 +145,6 @@ export default function SampleForm({ sample, onUpdate }: SampleFormProps) {
           </div>
         </div>
 
-        {/* Cupping Evaluation */}
         <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
           <h3 className="font-medium">Cupping Evaluation</h3>
           {renderNumberInput('fragranceAroma', 'Fragrance/Aroma', 6, 10)}
@@ -154,28 +163,15 @@ export default function SampleForm({ sample, onUpdate }: SampleFormProps) {
           </div>
         </div>
 
-        {/* Defects */}
         <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
           <h3 className="font-medium">Defects</h3>
           {renderNumberInput('primaryDefects', 'Primary Defects', 0, 10, 1)}
           {renderNumberInput('secondaryDefects', 'Secondary Defects', 0, 10, 1)}
           {renderNumberInput('taint', 'Taint', 0, 10, 1)}
           {renderNumberInput('fault', 'Fault', 0, 10, 1)}
-
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Roast Defects</label>
-            <textarea
-              name="roastDefects"
-              value={formData.roastDefects || ''}
-              onChange={handleChange}
-              className="w-full p-2 border rounded-md text-gray-900"
-              rows={3}
-            />
-          </div>
         </div>
       </div>
 
-      {/* Notes */}
       <div className="mt-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">Tasting Notes</label>
         <textarea

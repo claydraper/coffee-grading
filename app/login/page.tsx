@@ -42,9 +42,8 @@ export default function LoginPage() {
         throw new Error(result.error);
       }
 
-      // If we got here, sign in was successful
       router.push(callbackUrl);
-      router.refresh(); // Ensure the page updates with the new auth state
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during login');
       setIsLoading(false);
@@ -86,7 +85,7 @@ export default function LoginPage() {
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="email-address" className="sr-only">
-                Email address
+                Email
               </label>
               <input
                 id="email-address"
@@ -97,7 +96,7 @@ export default function LoginPage() {
                 value={formData.email}
                 onChange={handleChange}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
+                placeholder="Email"
               />
             </div>
             <div>

@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Header from '../components/Header';
+import Loader from '../components/Loader';
 
 interface Sample {
   id: string;
@@ -77,34 +78,10 @@ export default function CuppingsPage() {
     });
   };
 
-  const getCompletionStatus = (cupping: Cupping) => {
-    if (cupping.samples.length === 0) return 'No samples';
-
-    const completedSamples = cupping.samples.filter(sample =>
-      sample.finalScore !== undefined && sample.finalScore !== null
-    );
-
-    if (completedSamples.length === 0) return 'Not started';
-    if (completedSamples.length === cupping.samples.length) return 'Complete';
-    return `${completedSamples.length}/${cupping.samples.length} samples`;
-  };
-
-  const getStatusColor = (status: string) => {
-    if (status === 'Complete') return 'text-green-600 bg-green-50';
-    if (status === 'Not started' || status === 'No samples') return 'text-gray-600 bg-gray-50';
-    return 'text-blue-600 bg-blue-50';
-  };
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen bg-gray-100">
-        <Header />
-        <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
-          <div className="p-8 bg-white rounded-lg shadow-md">
-            <h1 className="text-2xl font-bold mb-4">Loading...</h1>
-          </div>
-        </div>
-      </div>
+      <Loader />
     );
   }
 
@@ -129,7 +106,6 @@ export default function CuppingsPage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900 mb-1">Cuppings</h1>
-            <p className="text-gray-600">View and manage your coffee cupping sessions</p>
           </div>
           <Link
             href="/cuppings/new"
@@ -166,12 +142,6 @@ export default function CuppingsPage() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Samples
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Avg Score
-                    </th>
                     <th className="relative px-6 py-3">
                       <span className="sr-only">Actions</span>
                     </th>
@@ -179,12 +149,6 @@ export default function CuppingsPage() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {cuppings.map((cupping) => {
-                    const status = getCompletionStatus(cupping);
-                    const avgScore = cupping.samples
-                      .filter(s => s.finalScore !== undefined && s.finalScore !== null)
-                      .reduce((acc, s, _, arr) => acc + (s.finalScore! / arr.length), 0)
-                      .toFixed(2);
-
                     return (
                       <tr key={cupping.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -192,11 +156,6 @@ export default function CuppingsPage() {
                             <div className="text-sm font-medium text-gray-900">
                               {cupping.name}
                             </div>
-                            {cupping.description && (
-                              <div className="text-sm text-gray-500 truncate max-w-xs">
-                                {cupping.description}
-                              </div>
-                            )}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -205,29 +164,19 @@ export default function CuppingsPage() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {cupping.samples.length}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(status)}`}>
-                            {status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {avgScore !== '0.00' ? avgScore : '-'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                          <Link
+                            href={`/cuppings/${cupping.id}/results`}
+                            className="text-indigo-600 hover:text-indigo-900"
+                          >
+                            View Results
+                          </Link>
                           <Link
                             href={`/cuppings/${cupping.id}`}
-                            className="text-blue-600 hover:text-blue-900 mr-4"
+                            className="text-blue-600 hover:text-blue-900"
                           >
-                            View
+                            Modify Cupping
                           </Link>
-                          {status !== 'Complete' && (
-                            <Link
-                              href={`/cuppings/${cupping.id}`}
-                              className="text-green-600 hover:text-green-900"
-                            >
-                              Continue
-                            </Link>
-                          )}
                         </td>
                       </tr>
                     );

@@ -3,9 +3,8 @@ import { auth } from '@/auth';
 import { PrismaClient } from '@prisma/client';
 import { prisma } from '@/app/lib/prisma';
 
-// Type assertion to fix the Prisma client type
 const prismaClient = prisma as unknown as PrismaClient & {
-  cupping: any; // Use 'any' as a last resort
+  cupping: any;
 };
 
 export async function POST(request: Request) {
@@ -14,19 +13,17 @@ export async function POST(request: Request) {
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    
-    // Get the user from the database
+
     const user = await prismaClient.user.findUnique({
       where: { email: session.user.email },
     });
-    
+
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     const { name, description, numberOfSamples } = await request.json();
 
-    // Create the cupping with its samples
     const cupping = await prismaClient.cupping.create({
       data: {
         name,
@@ -38,7 +35,6 @@ export async function POST(request: Request) {
             origin: '',
             process: '',
             userId: user.id,
-            // Set default values for required fields
             fragranceAroma: 6.0,
             dry: 6.0,
             break: 6.0,
@@ -60,7 +56,6 @@ export async function POST(request: Request) {
 
     const samples = cupping.samples;
 
-    // Return just the ID to reduce payload size
     return NextResponse.json(
       { id: cupping.id },
       { status: 201 }
@@ -80,12 +75,11 @@ export async function GET() {
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    
-    // Get the user from the database
+
     const user = await prismaClient.user.findUnique({
       where: { email: session.user.email },
     });
-    
+
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
